@@ -23,16 +23,12 @@ double MEMBRANE_REFINE_NO; // Number of grid cells above the membrane to refine
 double MEMBRANE_REFINED_HEIGHT; // Width of the refined area above the membrane 
 double DROP_CENTRE; // Initial centre position of the droplet
 double IMPACT_TIME; // Theoretical time of impact
-double MAX_TIME; // Maximum time to run the simulation for
 
 /* Global variables */
 double start_wall_time; // Time the simulation was started
 double end_wall_time; // Time the simulation finished
 int gfs_output_no = 1; // Records how many GFS files have been outputted
 int log_output_no = 0; // Records how many plate data files there have been
-int interface_output_no = 1; // Records how many interface files there have been
-// Stores time the interface was outputted
-char interface_time_filename[80] = "interface_times.txt"; 
 
 /* Boundary conditions */
 // Symmetry on left boundary
@@ -110,8 +106,8 @@ event refinement (i++) {
         minlevel = MINLEVEL, maxlevel = MAXLEVEL);
 
     // Refines above the membrane
-    refine((x < MEMBRANE_RADIUS) && (y <= MEMBRANE_REFINED_HEIGHT) \
-        && level < MAXLEVEL);
+    // refine((x < MEMBRANE_RADIUS) && (y <= MEMBRANE_REFINED_HEIGHT) \
+    //     && level < MAXLEVEL);
 }
 
 
@@ -122,17 +118,17 @@ event gravity (i++) {
 }
 
 
-// event small_droplet_removal (i++) {
-// /* Removes any small droplets or bubbles that have formed, that are smaller than
-//     a specific size */
-//     // Removes droplets of diameter 5 cells or less
-//     int remove_droplet_radius = min(20, (int)(0.2 / MIN_CELL_SIZE));
-//     // int remove_droplet_radius = (int)(0.25 / MIN_CELL_SIZE);
-//     remove_droplets(f, remove_droplet_radius);
+event small_droplet_removal (i++) {
+/* Removes any small droplets or bubbles that have formed, that are smaller than
+    a specific size */
+    // Removes droplets of diameter 5 cells or less
+    int remove_droplet_radius = min(20, (int)(0.2 / MIN_CELL_SIZE));
+    // int remove_droplet_radius = (int)(0.25 / MIN_CELL_SIZE);
+    remove_droplets(f, remove_droplet_radius);
 
-//     // Also remove air bubbles
-//     remove_droplets(f, remove_droplet_radius, 1e-4, true);
-// }
+    // Also remove air bubbles
+    remove_droplets(f, remove_droplet_radius, 1e-4, true);
+}
 
 
 event output_data (t += LOG_OUTPUT_TIMESTEP) {
@@ -161,7 +157,6 @@ event gfs_output (t += GFS_OUTPUT_TIMESTEP) {
     sprintf(gfs_filename, "gfs_output_%d.gfs", gfs_output_no);
     output_gfs(file = gfs_filename);
 
-    dump(dump_filename);
     gfs_output_no++;
 }
 
