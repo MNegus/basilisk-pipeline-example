@@ -143,8 +143,7 @@ event output_data (t += LOG_OUTPUT_TIMESTEP) {
     FILE *output_file = fopen(output_filename, "w");
 
     foreach_boundary(bottom) {
-        double ufy = uf.y[];
-        fprintf(output_file, "%g %g %g\n", x, ufy, p[]);
+        fprintf(output_file, "%g %g\n", x, p[]);
     }
     fclose(output_file);
 
